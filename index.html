@@ -132,13 +132,13 @@ function finish(){
  $('resultCount').textContent=run.qualified+'回';
  $('resultPella').textContent=run.pellaRate+'%';
  $('message').textContent=run.success?'見事、超抜突破！':'10G終了！';
- history.unshift({number:history.length+1,success:run.success,games:run.games.length,qualified:run.qualified,pella:run.pellaRate});
+ history.unshift({number:history.length+2,success:run.success,games:run.games.length,qualified:run.qualified,pella:run.pellaRate});
  renderHistory();
 }
 function renderHistory(){
  const el=$('historyList');
  if(!history.length){el.innerHTML='<div class="history-empty">まだ履歴はありません。</div>';return;}
- el.innerHTML=history.map((h,i)=>'<div class="history-item"><div><strong>第'+(history.length-i)+'回 '+(h.success?'<span class="win-text">突破成功</span>':'<span class="lose-text">失敗</span>')+'</strong><small>'+h.games+'G消化 ・ 小役成立 '+h.qualified+'回</small></div><div class="history-right"><strong>'+h.pella+'%</strong><small>ペラ出現率</small></div></div>').join('');
+ el.innerHTML=history.map((h,i)=>'<div class="history-item"><div><strong>第'+h.number+'回 '+(h.success?'<span class="win-text">突破成功</span>':'<span class="lose-text">失敗</span>')+'</strong><small>'+h.games+'G消化 ・ 小役成立 '+h.qualified+'回</small></div><div class="history-right"><strong>'+h.pella+'%</strong><small>ペラ出現率</small></div></div>').join('');
 }
 function again(){start();$('resultPanel').classList.add('hidden');}
 $('startBtn').addEventListener('click',start);
