@@ -132,7 +132,7 @@ function finish(){
  $('resultCount').textContent=run.qualified+'回';
  $('resultPella').textContent=run.pellaRate+'%';
  $('message').textContent=run.success?'見事、超抜突破！':'10G終了！';
- history.unshift({success:run.success,games:run.games.length,qualified:run.qualified,pella:run.pellaRate});
+ history.unshift({number:history.length+1,success:run.success,games:run.games.length,qualified:run.qualified,pella:run.pellaRate});
  renderHistory();
 }
 function renderHistory(){
