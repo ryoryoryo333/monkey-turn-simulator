@@ -115,7 +115,7 @@ function nextGame(){
  run.games.push(entry);
  const row=document.createElement('div');row.className='logrow';
  row.innerHTML='<span class="gnum">'+g+'G</span><span><span class="role">'+role.name+'</span><br><span class="chance">'+(role.hit?('AT当選期待度 '+role.hit+'%'):'AT抽選なし')+(ceiling?' ／ 9回天井到達':'')+'</span></span><span class="judgement '+(hit?'hit':'miss')+'">'+(hit?'突破！':'非当選')+'</span>';
- $('gameLog').appendChild(row);
+ $('gameLog').prepend(row);
  if(hit){run.finished=true;run.success=true;}
  else if(g>=10){run.finished=true;}
  updateTop();
