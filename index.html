@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>モンキーターンⅤ｜超抜チャレンジシミュレーター</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#141f32;--panel2:#1b2a42;--line:#2b3c58;--text:#f4f7fb;--muted:#9fb0c8;--gold:#f4c45e;--cyan:#55d5e8;--red:#ff6d75;--green:#68dfa0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#263b5e 0,#0b1220 58%);color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:22px 15px 48px}.top{text-align:center;margin-bottom:20px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.18em}.top h1{font-size:clamp(23px,5vw,34px);margin:7px 0 5px;letter-spacing:.03em}.top p{color:var(--muted);font-size:13px;margin:0}
+.panel{background:linear-gradient(145deg,rgba(25,39,61,.97),rgba(16,27,44,.97));border:1px solid var(--line);border-radius:18px;padding:18px;margin:13px 0;box-shadow:0 12px 28px #0003}
+.status{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:13px}.pill{border:1px solid var(--line);background:#0e192a;border-radius:999px;padding:6px 11px;font-weight:700;color:var(--gold)}
+.progress{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin:15px 0}.cell{height:8px;border-radius:8px;background:#34445d}.cell.done{background:var(--cyan)}.cell.win{background:var(--gold)}
+.big{font-size:clamp(36px,9vw,58px);font-weight:900;text-align:center;line-height:1.05;margin:15px 0 4px;font-variant-numeric:tabular-nums}.big small{font-size:16px;color:var(--muted);font-weight:600}.sub{text-align:center;color:var(--muted);font-size:13px}
+button{font:inherit;cursor:pointer;border:0;border-radius:13px;padding:15px 18px;font-weight:900;transition:transform .08s,filter .15s}button:active{transform:scale(.985)}button:disabled{opacity:.4;cursor:not-allowed}
+.primary{width:100%;background:linear-gradient(90deg,#f6ce6b,#e9a93e);color:#1c2430;font-size:18px;box-shadow:0 6px 18px #d99c3430}.secondary{background:#243650;color:var(--text);border:1px solid #405573}.actions{display:grid;gap:10px;margin-top:15px}
+.section-title{font-size:15px;font-weight:900;margin:0 0 13px;display:flex;align-items:center;gap:8px}.section-title:before{content:"";width:4px;height:17px;border-radius:4px;background:var(--cyan)}
+.result{display:none;text-align:center}.result.show{display:block}.result .stamp{font-size:12px;letter-spacing:.16em;color:var(--gold);font-weight:900}.result h2{font-size:32px;margin:7px 0}.result p{color:var(--muted);margin:7px 0}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}.stat{background:#0e192a;border:1px solid var(--line);border-radius:12px;padding:12px 5px}.stat strong{display:block;font-size:23px}.stat span{font-size:11px;color:var(--muted)}
+.log{display:grid;gap:8px}.logrow{display:grid;grid-template-columns:45px 1fr auto;align-items:center;gap:10px;padding:10px 11px;border-radius:11px;background:#0e192a;border:1px solid #263750;font-size:13px}.gnum{font-weight:900;color:var(--muted)}.role{font-weight:800}.chance{color:var(--muted);font-size:12px}.judgement{font-weight:900;color:var(--muted)}.judgement.hit{color:var(--gold)}.judgement.miss{color:#aab8ca}
+.history-empty{color:var(--muted);font-size:13px;text-align:center;padding:18px 5px}.history-list{display:grid;gap:8px}.history-item{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#0e192a;border:1px solid var(--line);border-radius:11px;padding:11px 12px;font-size:13px}.history-item strong{display:block;font-size:14px}.history-item small{color:var(--muted)}.history-right{text-align:right;white-space:nowrap}.win-text{color:var(--gold)}.lose-text{color:#ff8790}
+.note{font-size:11px;line-height:1.7;color:var(--muted)}.note a{color:var(--cyan)}.hidden{display:none!important}
+@media(min-width:600px){.panel{padding:21px}.actions{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top"><div class="eyebrow">SLOT SIMULATOR</div><h1>モンキーターンⅤ</h1><p>超抜チャレンジ シミュレーター</p></header>
+
+<section class="panel" id="gamePanel">
+ <div class="status"><span id="stateLabel">チャレンジ待機中</span><span class="pill" id="countPill">0 / 10 G</span></div>
+ <div class="progress" id="progress"></div>
+ <div class="big" id="gameCount">0 <small>/ 10 G</small></div>
+ <div class="sub" id="message">10Gの超抜チャレンジに挑戦！</div>
+ <div class="actions">
+  <button class="primary" id="startBtn">超抜チャレンジ開始</button>
+  <button class="primary hidden" id="leverBtn">レバーON！ 次の1Gへ</button>
+  <button class="secondary hidden" id="againBtn">次のチャレンジへ</button>
+ </div>
+</section>
+
+<section class="panel hidden" id="resultPanel">
+ <div class="result show">
+  <div class="stamp">CHALLENGE RESULT</div>
+  <h2 id="resultTitle">超抜突破！</h2>
+  <p id="resultDesc"></p>
+  <div class="statgrid">
+   <div class="stat"><strong id="resultGames">-</strong><span>消化G数</span></div>
+   <div class="stat"><strong id="resultCount">-</strong><span>ペラ・レア役成立</span></div>
+   <div class="stat"><strong id="resultPella">-</strong><span>今回のペラ出現率</span></div>
+  </div>
+  <button class="secondary" id="resultAgainBtn">もう一度チャレンジ</button>
+ </div>
+</section>
+
+<section class="panel">
+ <h3 class="section-title">今回のチャレンジ履歴</h3>
+ <div class="log" id="gameLog"><div class="history-empty">チャレンジを開始すると、ここに1Gずつ表示されます。</div></div>
+</section>
+
+<section class="panel">
+ <h3 class="section-title">チャレンジ履歴（過去の結果）</h3>
+ <div class="history-list" id="historyList"><div class="history-empty">まだ履歴はありません。</div></div>
+</section>
+
+<section class="panel">
+ <h3 class="section-title">抽選について</h3>
+ <p class="note">小役の出現率は一撃の解析ページに掲載された通常時／AT中の数値を参考にしています。ペラ出現率はシミュレーター独自設定として、チャレンジごとに50〜75%からランダムに決定し、結果発表まで非表示にします。成立役ごとのAT当選率と、ペラ・レア役合計9回成立時の強制クリアを反映しています。</p>
+ <p class="note">参考：<a href="https://1geki.jp/slot/l_monkeyturn5/4/" target="_blank" rel="noopener">小役確率</a> ／ <a href="https://1geki.jp/slot/l_monkeyturn5/61/" target="_blank" rel="noopener">超抜チャレンジ中の抽選</a></p>
+</section>
+</main>
+<script>
+const roles = [
+ {name:"ボート",p:1/89.9,hit:33.6,qualifies:true},
+ {name:"弱チェリー",p:1/69.9,hit:33.6,qualifies:true},
+ {name:"強チェリー",p:1/569.9,hit:100,qualifies:true},
+ {name:"弱チャンス目",p:1/297.9,hit:50,qualifies:true},
+ {name:"強チャンス目",p:1/448.9,hit:100,qualifies:true}
+];
+let run=null, history=[];
+const $=id=>document.getElementById(id);
+function progress(){ $('progress').innerHTML=Array.from({length:10},(_,i)=>'<i class="cell '+(i<(run?.games.length||0)?'done':'')+'"></i>').join(''); }
+function updateTop(){
+ const n=run?run.games.length:0;
+ $('gameCount').innerHTML=n+' <small>/ 10 G</small>';
+ $('countPill').textContent=n+' / 10 G';
+ $('stateLabel').textContent=!run?'チャレンジ待機中':run.finished?'チャレンジ終了':'超抜チャレンジ中';
+ progress();
+}
+function start(){
+ run={pellaRate:50+Math.floor(Math.random()*26),games:[],qualified:0,finished:false,success:false};
+ $('gameLog').innerHTML='';
+ $('resultPanel').classList.add('hidden');
+ $('startBtn').classList.add('hidden');$('againBtn').classList.add('hidden');
+ $('leverBtn').classList.remove('hidden');
+ $('message').textContent='ペラ出現率は結果発表まで秘密…';
+ updateTop();
+}
+function drawRole(){
+ const r=Math.random();
+ let sum=0;
+ for(const role of roles){sum+=role.p;if(r<sum)return role;}
+ if(r<sum+run.pellaRate/100)return {name:"ペラ",hit:9.4,qualifies:true};
+ return {name:"ハズレ",hit:0,qualifies:false};
+}
+function nextGame(){
+ if(!run||run.finished)return;
+ const role=drawRole();
+ const g=run.games.length+1;
+ let hit=role.hit>0 && Math.random()*100<role.hit;
+ if(role.qualifies)run.qualified++;
+ let ceiling=false;
+ if(!hit && run.qualified>=9){hit=true;ceiling=true;}
+ const entry={g,role:role.name,chance:role.hit,hit,ceiling};
+ run.games.push(entry);
+ const row=document.createElement('div');row.className='logrow';
+ row.innerHTML='<span class="gnum">'+g+'G</span><span><span class="role">'+role.name+'</span><br><span class="chance">'+(role.hit?('AT当選期待度 '+role.hit+'%'):'AT抽選なし')+(ceiling?' ／ 9回天井到達':'')+'</span></span><span class="judgement '+(hit?'hit':'miss')+'">'+(hit?'突破！':'非当選')+'</span>';
+ $('gameLog').appendChild(row);
+ if(hit){run.finished=true;run.success=true;}
+ else if(g>=10){run.finished=true;}
+ updateTop();
+ if(run.finished)finish();
+ else $('message').textContent='小役成立 '+run.qualified+' / 9回（天井）';
+}
+function finish(){
+ $('leverBtn').classList.add('hidden');$('againBtn').classList.remove('hidden');
+ $('resultPanel').classList.remove('hidden');
+ $('resultTitle').textContent=run.success?'超抜突破！':'チャレンジ失敗…';
+ $('resultTitle').className=run.success?'win-text':'lose-text';
+ $('resultDesc').textContent=run.success?run.games.length+'G目でAT当選！':'10G消化、AT非当選。';
+ $('resultGames').textContent=run.games.length+'G';
+ $('resultCount').textContent=run.qualified+'回';
+ $('resultPella').textContent=run.pellaRate+'%';
+ $('message').textContent=run.success?'見事、超抜突破！':'10G終了！';
+ history.unshift({success:run.success,games:run.games.length,qualified:run.qualified,pella:run.pellaRate});
+ renderHistory();
+}
+function renderHistory(){
+ const el=$('historyList');
+ if(!history.length){el.innerHTML='<div class="history-empty">まだ履歴はありません。</div>';return;}
+ el.innerHTML=history.map((h,i)=>'<div class="history-item"><div><strong>第'+(history.length-i)+'回 '+(h.success?'<span class="win-text">突破成功</span>':'<span class="lose-text">失敗</span>')+'</strong><small>'+h.games+'G消化 ・ 小役成立 '+h.qualified+'回</small></div><div class="history-right"><strong>'+h.pella+'%</strong><small>ペラ出現率</small></div></div>').join('');
+}
+function again(){start();$('resultPanel').classList.add('hidden');}
+$('startBtn').addEventListener('click',start);
+$('leverBtn').addEventListener('click',nextGame);
+$('againBtn').addEventListener('click',again);
+$('resultAgainBtn').addEventListener('click',again);
+updateTop();
+</script>
+</body>
+</html>
